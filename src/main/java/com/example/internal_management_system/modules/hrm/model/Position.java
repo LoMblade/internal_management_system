@@ -33,8 +33,7 @@ public class Position {
     private Long id;
 
     /**
-     * Field 'name' trong database - có thể là alias của title
-     * Nếu DB có cả name và title, thì name sẽ được populate từ title
+     * Field 'name' trong database - required field
      */
     @Column(name = "name", nullable = false, length = 100)
     private String name;

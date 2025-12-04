@@ -1,3 +1,4 @@
+<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.warehouse.model;
 
 import jakarta.persistence.*;
@@ -85,10 +86,38 @@ public class StockExport {
         if (status == null) {
             status = ExportStatus.DRAFT;
         }
+        // Auto-populate audit fields
+        populateAuditFields(true);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        // Auto-populate audit fields
+        populateAuditFields(false);
+    }
+
+    /**
+     * Auto-populate audit fields từ SecurityContext
+     */
+    private void populateAuditFields(boolean isCreate) {
+        try {
+            // Lấy username từ SecurityContext
+            String currentUsername = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+
+            if (isCreate) {
+                this.createdBy = currentUsername;
+            }
+            // StockExport không có updatedBy field, chỉ có createdBy
+        } catch (Exception e) {
+            // Nếu không có authentication context (ví dụ trong tests), set default values
+            if (isCreate) {
+                this.createdBy = "system";
+            }
+        }
     }
 }
+=======
+ 
+>>>>>>> Incoming (Background Agent changes)

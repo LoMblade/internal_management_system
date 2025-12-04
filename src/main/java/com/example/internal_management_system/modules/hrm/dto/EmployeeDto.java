@@ -1,12 +1,13 @@
+<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.dto;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -29,6 +30,11 @@ public class EmployeeDto {
     private String positionTitle;
     private BigDecimal salary;
     private String status;
+    private String createdBy;
+    private String updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+=======
+ 
+>>>>>>> Incoming (Background Agent changes)

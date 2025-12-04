@@ -1,3 +1,4 @@
+<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.warehouse.service;
 
 import com.example.internal_management_system.modules.warehouse.dto.StockImportDto;
@@ -14,5 +15,12 @@ public interface StockImportService {
 
     List<StockImportDto> getAll();
 
+    List<StockImportDto> getAllFiltered(); // Filtered based on user permissions
+
+    List<StockImportDto> getMyRecords(); // Records created by current user
+
     StockImportDto getById(Long id);
 }
+=======
+ 
+>>>>>>> Incoming (Background Agent changes)

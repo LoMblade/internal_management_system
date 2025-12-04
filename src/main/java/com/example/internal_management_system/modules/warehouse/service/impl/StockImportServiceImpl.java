@@ -1,3 +1,4 @@
+<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.warehouse.service.impl;
 
 import com.example.internal_management_system.modules.warehouse.dto.StockImportDto;
@@ -51,6 +52,39 @@ public class StockImportServiceImpl implements StockImportService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Lấy danh sách StockImports đã được filter theo quyền của user hiện tại
+     * - ADMIN: thấy tất cả
+     * - WAREHOUSE: thấy tất cả
+     */
+    @Override
+    public List<StockImportDto> getAllFiltered() {
+        // TODO: Implement filtering logic based on user role and permissions
+        // For now, return all records (same as getAll)
+        // Future enhancement: filter by warehouse, status, etc.
+        return getAll();
+    }
+
+    /**
+     * Lấy danh sách StockImports được tạo bởi user hiện tại
+     * Cho phép users xem records họ đã tạo
+     */
+    @Override
+    public List<StockImportDto> getMyRecords() {
+        // Lấy username từ SecurityContext
+        String currentUsername = org.springframework.security.core.context.SecurityContextHolder
+            .getContext().getAuthentication().getName();
+
+        if (currentUsername == null) {
+            return List.of(); // Trả về list rỗng nếu không có authentication
+        }
+
+        return repository.findAll().stream()
+                .filter(stockImport -> currentUsername.equals(stockImport.getCreatedBy()))
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public StockImportDto getById(Long id) {
         StockImport entity = repository.findById(id)
@@ -58,3 +92,6 @@ public class StockImportServiceImpl implements StockImportService {
         return mapper.toDto(entity);
     }
 }
+=======
+ 
+>>>>>>> Incoming (Background Agent changes)

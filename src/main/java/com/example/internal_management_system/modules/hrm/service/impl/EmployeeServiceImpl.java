@@ -1,3 +1,4 @@
+<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.service.impl;
 
 import com.example.internal_management_system.common.exceptions.ResourceNotFoundException;
@@ -52,6 +53,19 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Lấy danh sách employees đã được filter theo quyền của user hiện tại
+     * Hiện tại: tất cả HR users đều thấy tất cả employees
+     * Có thể mở rộng sau: filter theo department, manager, etc.
+     */
+    @Override
+    public List<EmployeeDto> getAllFiltered() {
+        // TODO: Implement filtering logic based on user role and permissions
+        // For now, return all employees (same as getAll)
+        // Future enhancement: filter by department for department managers, etc.
+        return getAll();
+    }
+
     @Override
     public EmployeeDto getById(Long id) {
         Employee entity = repository.findById(id)
@@ -59,3 +73,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapper.toDto(entity);
     }
 }
+=======
+ 
+>>>>>>> Incoming (Background Agent changes)

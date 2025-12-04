@@ -1,3 +1,4 @@
+<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.model;
 
 import java.math.BigDecimal;
@@ -76,6 +77,12 @@ public class Employee {
     @Column(length = 20)
     private EmployeeStatus status;
 
+    @Column(name = "created_by", length = 100)
+    private String createdBy;
+
+    @Column(name = "updated_by", length = 100)
+    private String updatedBy;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -93,10 +100,39 @@ public class Employee {
         if (status == null) {
             status = EmployeeStatus.ACTIVE;
         }
+        // Auto-populate audit fields
+        populateAuditFields(true);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        // Auto-populate audit fields
+        populateAuditFields(false);
+    }
+
+    /**
+     * Auto-populate audit fields từ SecurityContext
+     */
+    private void populateAuditFields(boolean isCreate) {
+        try {
+            // Lấy username từ SecurityContext
+            String currentUsername = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+
+            if (isCreate) {
+                this.createdBy = currentUsername;
+            }
+            this.updatedBy = currentUsername;
+        } catch (Exception e) {
+            // Nếu không có authentication context (ví dụ trong tests), set default values
+            if (isCreate) {
+                this.createdBy = "system";
+            }
+            this.updatedBy = "system";
+        }
     }
 }
+=======
+ 
+>>>>>>> Incoming (Background Agent changes)
