@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.service.impl;
 
 import com.example.internal_management_system.common.exceptions.ResourceNotFoundException;
@@ -73,6 +72,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapper.toDto(entity);
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)
+

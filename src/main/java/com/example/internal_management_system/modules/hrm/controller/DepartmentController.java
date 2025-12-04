@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.controller;
 
 import com.example.internal_management_system.modules.hrm.dto.DepartmentDto;
@@ -63,6 +62,4 @@ public class DepartmentController {
         return ResponseEntity.ok(service.getById(id));
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)
+

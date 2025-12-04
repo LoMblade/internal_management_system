@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.dto;
 
 import java.math.BigDecimal;
@@ -35,6 +34,4 @@ public class EmployeeDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)
+

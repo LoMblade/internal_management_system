@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.controller;
 
 import org.springframework.http.ResponseEntity;
@@ -81,6 +80,4 @@ public class EmployeeController {
         return ResponseEntity.ok(service.getById(id));
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)
+

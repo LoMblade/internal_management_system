@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.service;
 
 import com.example.internal_management_system.modules.hrm.dto.EmployeeDto;
@@ -19,6 +18,4 @@ public interface EmployeeService {
 
     EmployeeDto getById(Long id);
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)
+
