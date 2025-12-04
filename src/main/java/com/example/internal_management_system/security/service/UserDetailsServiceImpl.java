@@ -50,7 +50,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         public static UserDetailsImpl build(User user) {
-            GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
+            // Spring Security convention: ROLE_ prefix for role-based checks (hasRole)
+            // Ví dụ: role ADMIN trong DB -> authority "ROLE_ADMIN"
+            GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
 
             return new UserDetailsImpl(
                     user.getId(),
