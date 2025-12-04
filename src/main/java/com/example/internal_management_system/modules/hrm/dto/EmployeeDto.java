@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,14 @@ import lombok.NoArgsConstructor;
 public class EmployeeDto {
 
     private Long id;
+
+    /** Mã nhân viên duy nhất */
+    @NotBlank
     private String employeeCode;
+
+    /** Code nội bộ cho doanh nghiệp */
+    @NotBlank
+    private String code;
     private String firstName;
     private String lastName;
     private String fullName;

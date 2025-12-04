@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.internal_management_system.modules.hrm.dto.EmployeeDto;
 import com.example.internal_management_system.modules.hrm.service.EmployeeService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,7 +29,7 @@ public class EmployeeController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
-    public ResponseEntity<?> create(@RequestBody EmployeeDto dto) {
+    public ResponseEntity<?> create(@Valid @RequestBody EmployeeDto dto) {
         return ResponseEntity.ok(service.create(dto));
     }
 
@@ -37,7 +38,7 @@ public class EmployeeController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody EmployeeDto dto) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody EmployeeDto dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

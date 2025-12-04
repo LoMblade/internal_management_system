@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.model;
 
 import java.time.LocalDateTime;
@@ -91,6 +90,3 @@ public class Department {
         }
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)

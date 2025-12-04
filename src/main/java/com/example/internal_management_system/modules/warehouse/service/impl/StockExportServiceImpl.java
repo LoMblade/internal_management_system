@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.warehouse.service.impl;
 
 import com.example.internal_management_system.modules.warehouse.dto.StockExportDto;
@@ -92,6 +91,3 @@ public class StockExportServiceImpl implements StockExportService {
         return mapper.toDto(entity);
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)

@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.warehouse.controller;
 
 import com.example.internal_management_system.modules.warehouse.dto.StockExportDto;
@@ -82,6 +81,4 @@ public class StockExportController {
         return ResponseEntity.ok(service.getById(id));
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)
+

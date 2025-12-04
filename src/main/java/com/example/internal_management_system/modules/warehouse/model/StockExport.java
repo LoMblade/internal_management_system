@@ -1,4 +1,3 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.warehouse.model;
 
 import jakarta.persistence.*;
@@ -118,6 +117,3 @@ public class StockExport {
         }
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)

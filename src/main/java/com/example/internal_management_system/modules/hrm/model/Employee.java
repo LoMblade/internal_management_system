@@ -1,26 +1,17 @@
-<<<<<<< Current (Your changes)
 package com.example.internal_management_system.modules.hrm.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Entity
 @Table(name = "employees")
@@ -33,17 +24,31 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Mã nhân viên duy nhất */
     @Column(name = "employee_code", nullable = false, unique = true, length = 20)
+    @NotBlank
     private String employeeCode;
 
+    /** Code nội bộ cho doanh nghiệp (nếu không dùng có thể bỏ) */
+    @Column(name = "code", nullable = false, length = 20)
+    @NotBlank
+    private String code;
+
     @Column(name = "first_name", nullable = false, length = 50)
+    @NotBlank
     private String firstName;
 
     @Column(name = "last_name", nullable = false, length = 50)
+    @NotBlank
     private String lastName;
 
+    @Email
+    @NotBlank
     @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column(length = 20)
     private String phone;
@@ -57,9 +62,11 @@ public class Employee {
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
+    /** Chỉ lưu ID cho phép FE truyền trực tiếp */
     @Column(name = "department_id")
     private Long departmentId;
 
+    /** Relationship read-only */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", insertable = false, updatable = false)
     private Department department;
@@ -89,50 +96,51 @@ public class Employee {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    /** Trạng thái nhân viên */
     public enum EmployeeStatus {
         ACTIVE, INACTIVE, TERMINATED, ON_LEAVE
     }
 
+    /** Khi tạo mới */
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-        if (status == null) {
-            status = EmployeeStatus.ACTIVE;
-        }
-        // Auto-populate audit fields
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+
+        if (this.status == null)
+            this.status = EmployeeStatus.ACTIVE;
+
+        if (this.hireDate == null)
+            this.hireDate = LocalDate.now();
+
         populateAuditFields(true);
     }
 
+    /** Khi update */
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-        // Auto-populate audit fields
+        this.updatedAt = LocalDateTime.now();
         populateAuditFields(false);
     }
 
     /**
-     * Auto-populate audit fields từ SecurityContext
+     * Lấy thông tin user từ SecurityContext và set vào createdBy/updatedBy
      */
     private void populateAuditFields(boolean isCreate) {
-        try {
-            // Lấy username từ SecurityContext
-            String currentUsername = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication().getName();
+        String username = "system";
 
-            if (isCreate) {
-                this.createdBy = currentUsername;
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if (auth != null && auth.isAuthenticated()) {
+                username = auth.getName();
             }
-            this.updatedBy = currentUsername;
-        } catch (Exception e) {
-            // Nếu không có authentication context (ví dụ trong tests), set default values
-            if (isCreate) {
-                this.createdBy = "system";
-            }
-            this.updatedBy = "system";
+        } catch (Exception ignored) {}
+
+        if (isCreate) {
+            this.createdBy = username;
         }
+
+        this.updatedBy = username;
     }
 }
-=======
- 
->>>>>>> Incoming (Background Agent changes)

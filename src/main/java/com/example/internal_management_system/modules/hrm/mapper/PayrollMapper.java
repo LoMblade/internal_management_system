@@ -5,13 +5,12 @@ import com.example.internal_management_system.modules.hrm.model.Payroll;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface PayrollMapper {
 
-    @Mapping(target = "employeeName", expression = "java(payroll.getEmployee() != null ? payroll.getEmployee().getFirstName() + \" \" + payroll.getEmployee().getLastName() : null)")
+    @Mapping(target = "employeeName",
+            expression = "java(payroll.getEmployee() != null ? payroll.getEmployee().getFirstName() + \" \" + payroll.getEmployee().getLastName() : null)")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
     PayrollDto toDto(Payroll payroll);
 
