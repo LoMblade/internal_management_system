@@ -55,7 +55,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * Lấy danh sách employees đã được filter theo quyền của user hiện tại
      * Hiện tại: tất cả HR users đều thấy tất cả employees
-     * Có thể mở rộng sau: filter theo department, manager, etc.
      */
     @Override
     public List<EmployeeDto> getAllFiltered() {

@@ -63,7 +63,7 @@ public class User implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
 
-    // ================== BẮT BUỘC CHO SPRING SECURITY ==================
+    // ================== SPRING SECURITY ==================
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));

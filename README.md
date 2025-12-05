@@ -42,6 +42,7 @@ Internal Management System là một ứng dụng web REST API được xây d�
 - Role-based access control (RBAC)
 - Password encryption với BCrypt
 
+![img.png](img.png)
 ### 👥 HRM Features
 - ✅ CRUD Department (Phòng ban)
 - ✅ CRUD Position (Vị trí công việc)
