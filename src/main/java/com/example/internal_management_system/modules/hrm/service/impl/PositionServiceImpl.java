@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PositionServiceImpl implements PositionService {
+public class    PositionServiceImpl implements PositionService {
 
     private final PositionRepository repository;
     private final PositionMapper mapper;

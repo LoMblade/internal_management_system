@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DepartmentController {
 
-    private final DepartmentService service;
+    private final Department    Service service;
 
     /**
      * Tạo mới Department - chỉ ADMIN và HR có quyền
