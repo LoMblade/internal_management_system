@@ -46,7 +46,7 @@ public class User implements UserDetails {
     private LocalDateTime updatedAt;
 
     public enum Role {
-        ADMIN, HR, WAREHOUSE
+        ADMIN, HR, WAREHOUSE, MANAGER, STAFF
     }
 
     @PrePersist

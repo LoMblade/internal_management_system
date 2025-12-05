@@ -18,6 +18,13 @@ public class SecurityService {
     private final UserRepository userRepository;
 
     /**
+     * Kiểm tra user hiện tại có phải ADMIN không
+     */
+    public boolean isAdmin() {
+        return hasRole("ADMIN");
+    }
+
+    /**
      * Lấy User entity của người đang đăng nhập
      */
     public User getCurrentUser() {
@@ -39,6 +46,14 @@ public class SecurityService {
     public Long getCurrentUserId() {
         User user = getCurrentUser();
         return user != null ? user.getId() : null;
+    }
+
+    /**
+     * Lấy email của user hiện tại
+     */
+    public String getCurrentUserEmail() {
+        User user = getCurrentUser();
+        return user != null ? user.getEmail() : null;
     }
 
     /**
@@ -64,11 +79,17 @@ public class SecurityService {
     }
 
     /**
-     * Kiểm tra user hiện tại có phải ADMIN không
+     * Kiểm tra user hiện tại có bất kỳ role nào trong danh sách
      */
-    public boolean isAdmin() {
-        return hasRole("ADMIN");
+    public boolean hasAnyRole(String... roles) {
+        for (String role : roles) {
+            if (hasRole(role)) {
+                return true;
+            }
+        }
+        return false;
     }
+
 
     /**
      * Kiểm tra user hiện tại có phải chính chủ tài khoản này không (dùng cho update/delete own profile)

@@ -56,7 +56,7 @@ public class EmployeeController {
      * Lấy danh sách tất cả Employees - chỉ ADMIN và HR có quyền
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR') or hasRole('MANAGER') or hasRole('STAFF')")
     public ResponseEntity<?> list() {
         return ResponseEntity.ok(service.getAll());
     }
@@ -67,7 +67,7 @@ public class EmployeeController {
      * - HR: thấy tất cả employees
      */
     @GetMapping("/filtered")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR') or hasRole('MANAGER') or hasRole('STAFF')")
     public ResponseEntity<?> listFiltered() {
         return ResponseEntity.ok(service.getAllFiltered());
     }
@@ -76,7 +76,7 @@ public class EmployeeController {
      * Lấy Employee theo ID - chỉ ADMIN và HR có quyền
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR') or hasRole('MANAGER') or hasRole('STAFF')")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
