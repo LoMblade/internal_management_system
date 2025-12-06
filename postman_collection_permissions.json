@@ -1,0 +1,858 @@
+{
+	"info": {
+		"_postman_id": "permission-test-collection",
+		"name": "Internal Management System - Permission Testing",
+		"description": "Collection để test hệ thống phân quyền (Permission-Based Access Control)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Register Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    // Lưu userId nếu có trong response",
+									"    var response = pm.response.json();",
+									"    console.log('Admin registered:', response);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"email\": \"admin@company.com\",\n    \"password\": \"admin123\",\n    \"role\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var response = pm.response.json();",
+									"    pm.collectionVariables.set('adminToken', response.token);",
+									"    pm.collectionVariables.set('adminId', response.id);",
+									"    console.log('Admin token saved:', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Register Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    console.log('Manager registered');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"truongphong\",\n    \"email\": \"truongphong@company.com\",\n    \"password\": \"tp123\",\n    \"role\": \"MANAGER\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var response = pm.response.json();",
+									"    pm.collectionVariables.set('managerToken', response.token);",
+									"    pm.collectionVariables.set('managerId', response.id);",
+									"    console.log('Manager token saved:', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"truongphong\",\n    \"password\": \"tp123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Register Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    console.log('Staff registered');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"nhanvien\",\n    \"email\": \"nhanvien@company.com\",\n    \"password\": \"nv123\",\n    \"role\": \"STAFF\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var response = pm.response.json();",
+									"    pm.collectionVariables.set('staffToken', response.token);",
+									"    pm.collectionVariables.set('staffId', response.id);",
+									"    console.log('Staff token saved:', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"nhanvien\",\n    \"password\": \"nv123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Admin - Permission Management",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"roles"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"permissions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Permissions by Resource (EMPLOYEE)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/resources/EMPLOYEE/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"resources",
+								"EMPLOYEE",
+								"permissions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Permissions (Manager)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/users/{{managerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"users",
+								"{{managerId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Permissions (Staff)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/users/{{staffId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"users",
+								"{{staffId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Assign Permissions to Manager (CRUD Employee)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permissions\": [\n        {\n            \"resourceCode\": \"EMPLOYEE\",\n            \"permissionCode\": \"CREATE\"\n        },\n        {\n            \"resourceCode\": \"EMPLOYEE\",\n            \"permissionCode\": \"READ_ALL\"\n        },\n        {\n            \"resourceCode\": \"EMPLOYEE\",\n            \"permissionCode\": \"UPDATE\"\n        },\n        {\n            \"resourceCode\": \"EMPLOYEE\",\n            \"permissionCode\": \"DELETE\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/users/{{managerId}}/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"users",
+								"{{managerId}}",
+								"permissions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Assign Permissions to Staff (READ_OWN Employee)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permissions\": [\n        {\n            \"resourceCode\": \"EMPLOYEE\",\n            \"permissionCode\": \"READ_OWN\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/permissions/users/{{staffId}}/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"permissions",
+								"users",
+								"{{staffId}}",
+								"permissions"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Test Manager (CRUD Employee)",
+			"item": [
+				{
+					"name": "✅ Get All Employees",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					}
+				},
+				{
+					"name": "✅ Create Employee",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employeeCode\": \"EMP001\",\n    \"code\": \"EMP001\",\n    \"firstName\": \"Test\",\n    \"lastName\": \"User\",\n    \"email\": \"test@company.com\",\n    \"phone\": \"0123456789\",\n    \"hireDate\": \"2024-01-01\",\n    \"departmentId\": 1,\n    \"positionId\": 1,\n    \"salary\": 10000000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/employees",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					}
+				},
+				{
+					"name": "✅ Get Employee by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "✅ Update Employee",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employeeCode\": \"EMP001\",\n    \"code\": \"EMP001\",\n    \"firstName\": \"Updated\",\n    \"lastName\": \"Name\",\n    \"email\": \"updated@company.com\",\n    \"salary\": 12000000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "✅ Delete Employee",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Get Departments (Should Fail 403)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/departments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Get Stock Imports (Should Fail 403)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{managerToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock-imports",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"stock-imports"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Test Staff (READ_OWN Employee)",
+			"item": [
+				{
+					"name": "✅ Get Filtered Employees (Own Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/filtered",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"filtered"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Get All Employees (Should Fail 403)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					}
+				},
+				{
+					"name": "✅ Get Employee by ID (Own)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/{{staffId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"{{staffId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Create Employee (Should Fail 403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employeeCode\": \"EMP002\",\n    \"code\": \"EMP002\",\n    \"firstName\": \"New\",\n    \"lastName\": \"Emp\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/employees",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Update Employee (Should Fail 403)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employeeCode\": \"EMP001\",\n    \"firstName\": \"Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Delete Employee (Should Fail 403)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/employees/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "❌ Get Departments (Should Fail 403)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/departments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "managerToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "staffToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "managerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "staffId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+

@@ -54,7 +54,7 @@ public class AuthService {
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole(User.Role.valueOf(registerRequest.getRole().toUpperCase()));
+        user.setRole(User.LegacyRole.valueOf(registerRequest.getRole().toUpperCase()));
 
         return userRepository.save(user);
     }

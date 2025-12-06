@@ -1,0 +1,16 @@
+CURL commands để test phân quyền
+Bước 1: Chạy database migration trước
+mysql -u root -p your_database < database_migration.sql
+Bước 2: Đăng ký và đăng nhập Admin
+# Register Admincurl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d "{\"username\":\"admin\",\"email\":\"admin@company.com\",\"password\":\"admin123\",\"role\":\"ADMIN\"}"# Login Admin (lưu token)curl -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d "{\"username\":\"admin\",\"password\":\"admin123\"}"
+Bước 3: Đăng ký 2 user mới
+# Register Trưởng phòngcurl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d "{\"username\":\"truongphong\",\"email\":\"truongphong@company.com\",\"password\":\"tp123\",\"role\":\"MANAGER\"}"# Register Nhân viêncurl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d "{\"username\":\"nhanvien\",\"email\":\"nhanvien@company.com\",\"password\":\"nv123\",\"role\":\"STAFF\"}"
+Bước 4: Admin gán quyền (thay {userId} và {adminToken})
+Gán quyền cho Trưởng phòng (CRUD Employee):
+curl -X POST http://localhost:8080/api/admin/permissions/users/{userId}/permissions \  -H "Content-Type: application/json" \  -H "Authorization: Bearer {adminToken}" \  -d "{\"permissions\":[{\"resourceCode\":\"EMPLOYEE\",\"permissionCode\":\"CREATE\"},{\"resourceCode\":\"EMPLOYEE\",\"permissionCode\":\"READ_ALL\"},{\"resourceCode\":\"EMPLOYEE\",\"permissionCode\":\"UPDATE\"},{\"resourceCode\":\"EMPLOYEE\",\"permissionCode\":\"DELETE\"}]}"
+Gán quyền cho Nhân viên (chỉ READ_OWN):
+curl -X POST http://localhost:8080/api/admin/permissions/users/{userId}/permissions \  -H "Content-Type: application/json" \  -H "Authorization: Bearer {adminToken}" \  -d "{\"permissions\":[{\"resourceCode\":\"EMPLOYEE\",\"permissionCode\":\"READ_OWN\"}]}"
+Bước 5: Test quyền Trưởng phòng (thay {managerToken})
+# ✅ Xem danh sách employeescurl -X GET http://localhost:8080/api/employees -H "Authorization: Bearer {managerToken}"# ✅ Tạo employeecurl -X POST http://localhost:8080/api/employees \  -H "Content-Type: application/json" \  -H "Authorization: Bearer {managerToken}" \  -d "{\"employeeCode\":\"EMP001\",\"code\":\"EMP001\",\"firstName\":\"Test\",\"lastName\":\"User\",\"email\":\"test@company.com\",\"hireDate\":\"2024-01-01\",\"departmentId\":1,\"positionId\":1,\"salary\":10000000}"# ❌ Xem departments (sẽ bị 403)curl -X GET http://localhost:8080/api/departments -H "Authorization: Bearer {managerToken}"# ❌ Xem stock imports (sẽ bị 403)curl -X GET http://localhost:8080/api/stock-imports -H "Authorization: Bearer {managerToken}"
+Bước 6: Test quyền Nhân viên (thay {staffToken})
+# ✅ Xem thông tin của chính mìnhcurl -X GET http://localhost:8080/api/employees/filtered -H "Authorization: Bearer {staffToken}"# ❌ Xem tất cả employees (sẽ bị 403)curl -X GET http://localhost:8080/api/employees -H "Authorization: Bearer {staffToken}"# ❌ Tạo employee (sẽ bị 403)curl -X POST http://localhost:8080/api/employees \  -H "Content-Type: application/json" \  -H "Authorization: Bearer {staffToken}" \  -d "{\"employeeCode\":\"EMP002\",\"code\":\"EMP002\",\"firstName\":\"New\",\"lastName\":\"Emp\"}"
