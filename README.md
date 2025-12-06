@@ -11,6 +11,7 @@ Hệ thống quản lý nội bộ (mini), bao gồm quản lý nhân sự (HRM)
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Cài đặt và chạy](#cài-đặt-và-chạy)
+- [Hệ thống phân quyền](#hệ-thống-phân-quyền)
 - [API Documentation](#api-documentation)
 - [Testing với Postman](#testing-với-postman)
 - [Testing với cURL](#testing-với-curl)
@@ -19,7 +20,7 @@ Hệ thống quản lý nội bộ (mini), bao gồm quản lý nhân sự (HRM)
 
 ##Tổng quan
 
-Internal Management System là một ứng dụng web REST API được xây dựng bằng Spring Boot, cung cấp giải pháp toàn diện cho việc quản lý nhân sự và kho hàng của doanh nghiệp. Hệ thống hỗ trợ xác thực JWT và phân quyền theo vai trò (ADMIN, HR, WAREHOUSE).
+Internal Management System là một ứng dụng web REST API được xây dựng bằng Spring Boot, cung cấp giải pháp toàn diện cho việc quản lý nhân sự và kho hàng của doanh nghiệp. Hệ thống hỗ trợ xác thực JWT và **phân quyền linh hoạt theo Permission-Based Access Control (PBAC)**, cho phép Admin quản lý quyền chi tiết cho từng user.
 
 ### 🏢 Mô-đun HRM (Human Resource Management)
 - Quản lý phòng ban và vị trí công việc
@@ -36,10 +37,21 @@ Internal Management System là một ứng dụng web REST API được xây d�
 
 ## ✨ Tính năng
 
+### 🎯 Phân Quyền Linh Hoạt (Permission-Based)
+- **Admin** có thể gán quyền chi tiết cho từng user
+- Phân quyền theo từng bảng (EMPLOYEE, DEPARTMENT, STOCK_IMPORT, etc.)
+- Phân quyền theo từng chức năng (CREATE, READ_ALL, READ_OWN, UPDATE, DELETE)
+- Hỗ trợ nhiều roles: ADMIN, HR, WAREHOUSE, MANAGER, STAFF
+- User có thể có nhiều roles và permissions trực tiếp (override)
+- API quản lý quyền: `/api/admin/permissions/**`
+
 ### 🔐 Authentication & Authorization
 - Đăng ký và đăng nhập người dùng
 - JWT Token-based authentication
-- Role-based access control (RBAC)
+- **Permission-Based Access Control (PBAC)** - Phân quyền linh hoạt
+- Admin có thể gán quyền chi tiết cho từng user (tick/tick)
+- Hỗ trợ nhiều roles: ADMIN, HR, WAREHOUSE, MANAGER, STAFF
+- Phân quyền theo từng bảng, từng chức năng (CREATE, READ_ALL, READ_OWN, UPDATE, DELETE)
 - Password encryption với BCrypt
 
 ### 👥 HRM Features
@@ -129,11 +141,29 @@ internal_management_system/
 │   └── security/                  # Security & Authentication
 │       ├── config/
 │       ├── controller/
+│       │   └── AdminPermissionController.java  # Quản lý quyền
 │       ├── dto/
+│       │   ├── PermissionDto.java
+│       │   ├── UserPermissionDto.java
+│       │   ├── AssignPermissionRequest.java
+│       │   └── AssignRoleRequest.java
+│       ├── evaluator/
+│       │   └── CustomPermissionEvaluator.java  # Permission evaluator
 │       ├── jwt/
 │       ├── model/
+│       │   ├── User.java
+│       │   ├── Role.java          # Role entity
+│       │   ├── Permission.java    # Permission entity
+│       │   ├── Resource.java      # Resource entity
+│       │   └── Module.java        # Module entity
 │       ├── repository/
+│       │   ├── RoleRepository.java
+│       │   ├── PermissionRepository.java
+│       │   ├── ResourceRepository.java
+│       │   └── ModuleRepository.java
 │       └── service/
+│           ├── PermissionService.java  # Service quản lý permissions
+│           └── SecurityService.java
 ├── src/main/resources/
 │   ├── application.properties     # Application configuration
 │   └── static/                    # Static resources
@@ -141,7 +171,11 @@ internal_management_system/
 ├── target/                        # Build output
 ├── pom.xml                        # Maven configuration
 ├── postman_collection.json        # Postman collection
+├── postman_test.json             # Postman test collection
+├── database_migration.sql         # Database migration script
 ├── api_test_commands.sh          # cURL test commands
+├── CURL_TEST_PHAN_QUYEN.txt     # cURL commands để test phân quyền
+├── VI_TRI_PHAN_QUYEN.md         # Tài liệu vị trí phân quyền
 └── README.md
 ```
 
@@ -172,6 +206,19 @@ spring.datasource.username=root
 spring.datasource.password=123456
 ```
 
+### 2.1. Chạy Database Migration (QUAN TRỌNG)
+Chạy script migration để tạo các bảng phân quyền:
+```bash
+mysql -u root -p qlnb < database_migration.sql
+```
+
+Hoặc import file `database_migration.sql` vào MySQL Workbench/phpMyAdmin.
+
+**Lưu ý:** Script này sẽ tạo các bảng:
+- `roles`, `modules`, `resources`, `permissions`
+- `user_roles`, `role_permissions`, `user_permissions`
+- Và insert data mẫu (roles, modules, resources, permissions)
+
 ### 3. Build và chạy ứng dụng
 ```bash
 # Build project
@@ -183,6 +230,57 @@ mvn spring-boot:run
 
 ### 4. Kiểm tra
 Ứng dụng sẽ chạy trên: `http://localhost:8080`
+
+## 🔐 Hệ thống phân quyền
+
+### Tổng quan
+Hệ thống sử dụng **Permission-Based Access Control (PBAC)** cho phép Admin quản lý quyền chi tiết cho từng user. Thay vì chỉ có roles cố định, Admin có thể "tick/tick" permissions cho từng user.
+
+### Cấu trúc phân quyền
+- **Module**: Mô-đun chính (HRM, WAREHOUSE)
+- **Resource**: Bảng/tài nguyên cụ thể (EMPLOYEE, DEPARTMENT, STOCK_IMPORT, etc.)
+- **Permission**: Quyền cụ thể (CREATE, READ_ALL, READ_OWN, UPDATE, DELETE)
+- **Role**: Nhóm quyền có thể gán cho nhiều user (ADMIN, HR, WAREHOUSE, MANAGER, STAFF)
+
+### Cách sử dụng
+
+#### 1. Admin gán quyền cho User
+```bash
+# Gán permissions trực tiếp cho user
+POST /api/admin/permissions/users/{userId}/permissions
+{
+  "permissions": [
+    {"resourceCode": "EMPLOYEE", "permissionCode": "CREATE"},
+    {"resourceCode": "EMPLOYEE", "permissionCode": "READ_ALL"},
+    {"resourceCode": "EMPLOYEE", "permissionCode": "UPDATE"},
+    {"resourceCode": "EMPLOYEE", "permissionCode": "DELETE"}
+  ]
+}
+
+# Hoặc gán role (role đã có sẵn permissions)
+POST /api/admin/permissions/users/{userId}/roles
+{
+  "roleIds": [1, 2]
+}
+```
+
+#### 2. Xem quyền của User
+```bash
+GET /api/admin/permissions/users/{userId}
+```
+
+#### 3. Ví dụ: Tạo Trưởng phòng (Manager)
+- Có quyền CRUD đầy đủ trên bảng `EMPLOYEE`
+- Không có quyền trên các bảng khác
+
+#### 4. Ví dụ: Tạo Nhân viên (Staff)
+- Chỉ có quyền `READ_OWN` trên bảng `EMPLOYEE` (xem thông tin của chính mình)
+- Không có quyền trên các bảng khác
+
+### Tài liệu tham khảo
+- Xem file `VI_TRI_PHAN_QUYEN.md` để biết code phân quyền ở đâu
+- Xem file `CURL_TEST_PHAN_QUYEN.txt` để có các lệnh curl test phân quyền
+- Xem file `HUONG_DAN_SU_DUNG.md` (nếu có) để có hướng dẫn chi tiết
 
 ## 📚 API Documentation
 
@@ -216,21 +314,36 @@ Content-Type: application/json
 
 #### Departments
 ```http
-GET    /api/departments
-POST   /api/departments
-GET    /api/departments/{id}
-PUT    /api/departments/{id}
-DELETE /api/departments/{id}
+GET    /api/departments          # Cần: DEPARTMENT_READ_ALL
+POST   /api/departments          # Cần: DEPARTMENT_CREATE
+GET    /api/departments/{id}     # Cần: DEPARTMENT_READ_ALL
+PUT    /api/departments/{id}     # Cần: DEPARTMENT_UPDATE
+DELETE /api/departments/{id}     # Cần: DEPARTMENT_DELETE
 ```
 
 #### Employees
 ```http
-GET    /api/employees
-POST   /api/employees
-GET    /api/employees/{id}
-PUT    /api/employees/{id}
-DELETE /api/employees/{id}
+GET    /api/employees            # Cần: EMPLOYEE_READ_ALL hoặc EMPLOYEE_READ_OWN
+POST   /api/employees            # Cần: EMPLOYEE_CREATE
+GET    /api/employees/{id}       # Cần: EMPLOYEE_READ_ALL hoặc canViewEmployee(id)
+PUT    /api/employees/{id}       # Cần: EMPLOYEE_UPDATE
+DELETE /api/employees/{id}      # Cần: EMPLOYEE_DELETE
+GET    /api/employees/filtered   # Cần: EMPLOYEE_READ_ALL hoặc EMPLOYEE_READ_OWN
 ```
+
+### 🔐 Admin Permission Management Endpoints
+
+#### Quản lý quyền cho User
+```http
+GET    /api/admin/permissions/users/{userId}              # Xem quyền của user
+POST   /api/admin/permissions/users/{userId}/roles         # Gán roles cho user
+POST   /api/admin/permissions/users/{userId}/permissions   # Gán permissions cho user
+GET    /api/admin/permissions/roles                       # Lấy tất cả roles
+GET    /api/admin/permissions/permissions                  # Lấy tất cả permissions
+GET    /api/admin/permissions/resources/{resourceCode}/permissions  # Lấy permissions theo resource
+```
+
+**Lưu ý:** Tất cả endpoints `/api/admin/permissions/**` chỉ ADMIN mới được truy cập.
 
 ### 📦 Warehouse Endpoints
 
@@ -258,17 +371,18 @@ DELETE /api/products/{id}
 1. Mở **Postman**
 2. Click **Import** (top left)
 3. Chọn **File**
-4. Import file `postman_collection.json`
-5. Collection **"Internal Management System API"** sẽ xuất hiện
+4. Import file `postman_test.json` hoặc `postman_collection.json`
+5. Collection sẽ xuất hiện
 
 ### Sử dụng Collection
-1. **Đầu tiên**: Chạy request **"Register Admin"** hoặc **"Register HR"**
-2. **Thứ hai**: Chạy request **"Login"** để lấy JWT token
-3. **Thứ ba**: Copy token và update **"Authorization"** header cho các request khác:
-   ```
-   Authorization: Bearer YOUR_JWT_TOKEN_HERE
-   ```
-4. **Cuối cùng**: Test các API CRUD khác
+1. **Bước 1**: Chạy database migration (`database_migration.sql`)
+2. **Bước 2**: Chạy request **"Register Admin"** để tạo admin
+3. **Bước 3**: Chạy request **"Login Admin"** để lấy JWT token (tự động lưu vào environment)
+4. **Bước 4**: Register và gán quyền cho user mới (dùng AdminPermissionController)
+5. **Bước 5**: Test các API với permissions đã gán
+
+### Test Phân Quyền
+Xem file `CURL_TEST_PHAN_QUYEN.txt` để có các lệnh curl test phân quyền chi tiết.
 
 ## 🌐 Testing với cURL
 
@@ -294,12 +408,42 @@ curl -X POST http://localhost:8080/api/auth/login \
   }'
 ```
 
-### Bước 3: Test API với JWT Token
+### Bước 3: Admin gán quyền cho User
+
+**Ví dụ: Gán quyền CRUD Employee cho Trưởng phòng**
+```bash
+# Thay {userId} bằng ID của user, {adminToken} bằng token của admin
+curl -X POST http://localhost:8080/api/admin/permissions/users/{userId}/permissions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {adminToken}" \
+  -d '{
+    "permissions": [
+      {"resourceCode": "EMPLOYEE", "permissionCode": "CREATE"},
+      {"resourceCode": "EMPLOYEE", "permissionCode": "READ_ALL"},
+      {"resourceCode": "EMPLOYEE", "permissionCode": "UPDATE"},
+      {"resourceCode": "EMPLOYEE", "permissionCode": "DELETE"}
+    ]
+  }'
+```
+
+**Ví dụ: Gán quyền READ_OWN cho Nhân viên**
+```bash
+curl -X POST http://localhost:8080/api/admin/permissions/users/{userId}/permissions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {adminToken}" \
+  -d '{
+    "permissions": [
+      {"resourceCode": "EMPLOYEE", "permissionCode": "READ_OWN"}
+    ]
+  }'
+```
+
+### Bước 4: Test API với JWT Token
 ```bash
 # Thay YOUR_JWT_TOKEN_HERE bằng token từ response login
 TOKEN="YOUR_JWT_TOKEN_HERE"
 
-# Tạo Department
+# Tạo Department (cần DEPARTMENT_CREATE permission)
 curl -X POST http://localhost:8080/api/departments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
@@ -308,12 +452,13 @@ curl -X POST http://localhost:8080/api/departments \
     "description": "IT Department responsible for technology infrastructure"
   }'
 
-# Tạo Employee
+# Tạo Employee (cần EMPLOYEE_CREATE permission)
 curl -X POST http://localhost:8080/api/employees \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
     "employeeCode": "EMP001",
+    "code": "EMP001",
     "firstName": "Nguyen",
     "lastName": "Van A",
     "email": "nguyenvana@company.com",
@@ -325,7 +470,7 @@ curl -X POST http://localhost:8080/api/employees \
   }'
 ```
 
-### Bước 4: Test Warehouse APIs
+### Bước 5: Test Warehouse APIs
 ```bash
 # Tạo Category
 curl -X POST http://localhost:8080/api/categories \
@@ -352,7 +497,7 @@ curl -X POST http://localhost:8080/api/products \
   }'
 ```
 
-### Bước 5: Test Các API Khác
+### Bước 6: Test Các API Khác
 ```bash
 # Get all departments
 curl -X GET http://localhost:8080/api/departments \
