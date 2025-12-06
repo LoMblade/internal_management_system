@@ -56,7 +56,7 @@ public class EmployeeController {
      * Lấy danh sách tất cả Employees - chỉ ADMIN và HR có quyền
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR') or hasRole('MANAGER') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
     public ResponseEntity<?> list() {
         return ResponseEntity.ok(service.getAll());
     }
