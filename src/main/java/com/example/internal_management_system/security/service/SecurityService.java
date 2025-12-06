@@ -18,13 +18,6 @@ public class SecurityService {
     private final UserRepository userRepository;
 
     /**
-     * Kiểm tra user hiện tại có phải ADMIN không
-     */
-    public boolean isAdmin() {
-        return hasRole("ADMIN");
-    }
-
-    /**
      * Lấy User entity của người đang đăng nhập
      */
     public User getCurrentUser() {
@@ -90,6 +83,12 @@ public class SecurityService {
         return false;
     }
 
+    /**
+     * Kiểm tra user hiện tại có phải ADMIN không
+     */
+    public boolean isAdmin() {
+        return hasRole("ADMIN");
+    }
 
     /**
      * Kiểm tra user hiện tại có phải chính chủ tài khoản này không (dùng cho update/delete own profile)

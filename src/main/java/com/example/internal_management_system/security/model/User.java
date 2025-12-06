@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -32,9 +34,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    // Giữ lại role cũ để backward compatibility (có thể xóa sau)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @Column(nullable = true)
+    private LegacyRole role;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -45,7 +48,26 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public enum Role {
+    // Nhiều roles
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    // Permissions trực tiếp (override)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_permissions",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> directPermissions = new HashSet<>();
+
+    // Enum cũ để backward compatibility
+    public enum LegacyRole {
         ADMIN, HR, WAREHOUSE, MANAGER, STAFF
     }
 
@@ -63,10 +85,63 @@ public class User implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
 
-    // ================== SPRING SECURITY ==================
+    // ================== BẮT BUỘC CHO SPRING SECURITY ==================
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        // Admin có tất cả quyền
+        if (hasRole("ADMIN")) {
+            authorities.add(new SimpleGrantedAuthority("PERM_ALL"));
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            return authorities;
+        }
+
+        // Lấy permissions từ roles
+        if (roles != null) {
+            for (Role role : roles) {
+                // Thêm role authority
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                
+                // Thêm permissions từ role
+                if (role.getPermissions() != null) {
+                    for (Permission permission : role.getPermissions()) {
+                        String permissionString = "PERM_" + permission.getResource().getCode() + "_" + permission.getCode();
+                        authorities.add(new SimpleGrantedAuthority(permissionString));
+                    }
+                }
+            }
+        }
+
+        // Lấy permissions trực tiếp (override)
+        if (directPermissions != null) {
+            for (Permission permission : directPermissions) {
+                String permissionString = "PERM_" + permission.getResource().getCode() + "_" + permission.getCode();
+                authorities.add(new SimpleGrantedAuthority(permissionString));
+            }
+        }
+
+        // Backward compatibility: Nếu có role cũ
+        if (role != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        }
+
+        return authorities;
+    }
+
+    /**
+     * Kiểm tra user có role không
+     */
+    public boolean hasRole(String roleName) {
+        if (roles != null) {
+            return roles.stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(roleName));
+        }
+        // Backward compatibility
+        if (role != null) {
+            return role.name().equalsIgnoreCase(roleName);
+        }
+        return false;
     }
 
     @Override

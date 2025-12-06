@@ -1,21 +1,13 @@
 package com.example.internal_management_system.modules.hrm.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.internal_management_system.modules.hrm.dto.EmployeeDto;
 import com.example.internal_management_system.modules.hrm.service.EmployeeService;
-
+import com.example.internal_management_system.security.service.PermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -23,60 +15,69 @@ import lombok.RequiredArgsConstructor;
 public class EmployeeController {
 
     private final EmployeeService service;
+    private final PermissionService permissionService;
 
     /**
-     * Tạo mới Employee - chỉ ADMIN và HR có quyền
+     * Tạo mới Employee - cần permission EMPLOYEE_CREATE
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasPermission('EMPLOYEE', 'CREATE')")
     public ResponseEntity<?> create(@Valid @RequestBody EmployeeDto dto) {
         return ResponseEntity.ok(service.create(dto));
     }
 
     /**
-     * Cập nhật Employee - chỉ ADMIN và HR có quyền
+     * Cập nhật Employee - cần permission EMPLOYEE_UPDATE
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasPermission('EMPLOYEE', 'UPDATE')")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody EmployeeDto dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     /**
-     * Xóa Employee - chỉ ADMIN và HR có quyền
+     * Xóa Employee - cần permission EMPLOYEE_DELETE
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasPermission('EMPLOYEE', 'DELETE')")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.ok().build();
     }
 
     /**
-     * Lấy danh sách tất cả Employees - chỉ ADMIN và HR có quyền
+     * Lấy danh sách Employees
+     * - Có READ_ALL: thấy tất cả
+     * - Chỉ có READ_OWN: thấy của chính mình
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
+    @PreAuthorize("hasPermission('EMPLOYEE', 'READ_ALL') or hasPermission('EMPLOYEE', 'READ_OWN')")
     public ResponseEntity<?> list() {
-        return ResponseEntity.ok(service.getAll());
+        // Kiểm tra quyền và trả về dữ liệu phù hợp
+        if (permissionService.canReadAll("EMPLOYEE")) {
+            return ResponseEntity.ok(service.getAll());
+        } else if (permissionService.canReadOwn("EMPLOYEE")) {
+            return ResponseEntity.ok(service.getAllFiltered());
+        }
+        return ResponseEntity.ok(service.getAllFiltered());
     }
 
     /**
-     * Lấy danh sách Employees đã được filter theo quyền của user hiện tại
-     * - ADMIN: thấy tất cả
-     * - HR: thấy tất cả employees
+     * Lấy danh sách Employees đã được filter theo quyền
      */
     @GetMapping("/filtered")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR') or hasRole('MANAGER') or hasRole('STAFF')")
+    @PreAuthorize("hasPermission('EMPLOYEE', 'READ_ALL') or hasPermission('EMPLOYEE', 'READ_OWN')")
     public ResponseEntity<?> listFiltered() {
         return ResponseEntity.ok(service.getAllFiltered());
     }
 
     /**
-     * Lấy Employee theo ID - chỉ ADMIN và HR có quyền
+     * Lấy Employee theo ID
+     * - Có READ_ALL: xem được tất cả
+     * - Chỉ có READ_OWN: chỉ xem được của chính mình
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR') or hasRole('MANAGER') or hasRole('STAFF')")
+    @PreAuthorize("hasPermission('EMPLOYEE', 'READ_ALL') or @permissionService.canViewEmployee(#id)")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }

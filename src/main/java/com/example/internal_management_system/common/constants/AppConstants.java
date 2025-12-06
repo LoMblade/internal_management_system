@@ -11,7 +11,7 @@ public class AppConstants {
     public static final String ROLE_HR = "HR";
     public static final String ROLE_WAREHOUSE = "WAREHOUSE";
     public static final String ROLE_MANAGER = "MANAGER";
-    public static final String Role_STAFF = "STAFF";
+    public static final String ROLE_STAFF = "STAFF";
 
     // Common Messages
     public static final String RESOURCE_NOT_FOUND = "Resource not found";
